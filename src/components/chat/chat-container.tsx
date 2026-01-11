@@ -7,21 +7,22 @@ import { cn } from "@/lib/utils"
 
 interface ChatContainerProps {
   messages: any[]
-  isLoading: boolean
+  status: 'submitted' | 'streaming' | 'ready' | 'error'
   isThinking: boolean
   onSuggestionClick?: (suggestion: string) => void
 }
 
-const SUGGESTIONS = [
-  "帮我分析这个数据集",
-  "生成一个销售趋势图表",
-  "解释一下机器学习",
-  "写一个Python爬虫",
-  "帮我优化这段代码",
-]
-
-export function ChatContainer({ messages, isLoading, isThinking, onSuggestionClick }: ChatContainerProps) {
+export function ChatContainer({ messages, status, isThinking, onSuggestionClick }: ChatContainerProps) {
+  const isLoading = status === 'submitted' || status === 'streaming'
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  const SUGGESTIONS = [
+    "帮我分析这个数据集",
+    "生成一个销售趋势图表",
+    "解释一下机器学习",
+    "写一个Python爬虫",
+    "帮我优化这段代码",
+  ]
 
   useEffect(() => {
     if (scrollRef.current) {

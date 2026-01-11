@@ -1,14 +1,21 @@
 "use client"
 
-import { Sparkles, Settings, Plus, Wand2 } from "lucide-react"
+import { Sparkles, Plus, Wand2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { SystemPromptSettings } from "./system-prompt-settings"
 
 interface HeaderProps {
   onNewChat?: () => void
+  systemPrompt?: string
+  onSystemPromptChange: (prompt: string) => void
 }
 
-export function Header({ onNewChat }: HeaderProps) {
+export function Header({ onNewChat, systemPrompt, onSystemPromptChange }: HeaderProps) {
+  const handleSystemPromptChange = (prompt: string) => {
+    onSystemPromptChange(prompt)
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md dark:bg-slate-900/80">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -33,9 +40,10 @@ export function Header({ onNewChat }: HeaderProps) {
           >
             <Plus className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-9 w-9">
-            <Settings className="h-5 w-5" />
-          </Button>
+          <SystemPromptSettings 
+            initialSystemPrompt={systemPrompt} 
+            onSystemPromptChange={handleSystemPromptChange} 
+          />
           <ThemeToggle />
         </div>
       </div>

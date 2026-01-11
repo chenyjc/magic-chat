@@ -1,5 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai'
-import { streamText } from 'ai'
+import { convertToModelMessages, streamText } from 'ai'
 
 export const runtime = 'edge'
 
@@ -9,12 +9,13 @@ const ollama = createOpenAI({
 })
 
 export async function POST(req: Request) {
-  const { messages } = await req.json()
+  const { messages, systemPrompt } = await req.json()
 
   const result = streamText({
-    model: ollama(process.env.OLLAMA_MODEL || 'qwen3:4b'),
-    messages,
+    model: ollama(process.env.OLLAMA_MODEL || 'qwen3-coder:30b'),
+    system: systemPrompt,
+    messages: await convertToModelMessages(messages),
   })
 
-  return result.toDataStreamResponse()
+  return result.toUIMessageStreamResponse()
 }

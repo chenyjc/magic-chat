@@ -7,20 +7,27 @@ import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
 interface InputAreaProps {
-  input: string
+  defaultValue?: string
   handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
-  handleSubmit: (e: React.FormEvent) => void
-  isLoading: boolean
+  sendMessage: (message: { text: string }, options?: { body?: { systemPrompt?: string } }) => void
+  status: 'submitted' | 'streaming' | 'ready' | 'error'
   onStop: () => void
+  systemPrompt?: string
 }
 
-export function InputArea({ input, handleInputChange, handleSubmit, isLoading, onStop }: InputAreaProps) {
+export function InputArea({ defaultValue, handleInputChange, sendMessage, status, onStop, systemPrompt }: InputAreaProps) {
+  const isLoading = status === 'submitted' || status === 'streaming'
+  const [input, setInput] = useState(defaultValue || '')
   const [isRecording, setIsRecording] = useState(false)
   const [recordingDuration, setRecordingDuration] = useState(0)
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const recognitionRef = useRef<any>(null)
+
+  useEffect(() => {
+    setInput(defaultValue || '')
+  }, [defaultValue])
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -35,7 +42,10 @@ export function InputArea({ input, handleInputChange, handleSubmit, isLoading, o
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSubmit(e)
+      if (input.trim()) {
+        sendMessage({ text: input.trim() }, { body: { systemPrompt } })
+        setInput('')
+      }
     }
   }
 
@@ -173,8 +183,7 @@ export function InputArea({ input, handleInputChange, handleSubmit, isLoading, o
   return (
     <div className="bg-background p-4">
       <div className="container mx-auto max-w-3xl">
-        <div className="relative rounded-xl border-2 border-input bg-background shadow-lg">
-          {/* 隐藏的文件输入框 */}
+        <div className="relative rounded-xl border-2 border-input bg-background/80 backdrop-blur-md shadow-lg">
           <input
             ref={fileInputRef}
             type="file"
@@ -183,7 +192,6 @@ export function InputArea({ input, handleInputChange, handleSubmit, isLoading, o
             className="hidden"
           />
 
-          {/* 图片预览 */}
           {uploadedImage && (
             <div className="relative p-4 pb-2">
               <div className="relative inline-block">
@@ -204,18 +212,19 @@ export function InputArea({ input, handleInputChange, handleSubmit, isLoading, o
             </div>
           )}
 
-          {/* 输入框 */}
           <Textarea
             ref={textareaRef}
             value={input}
-            onChange={handleInputChange}
+            onChange={(e) => {
+              setInput(e.target.value)
+              handleInputChange(e)
+            }}
             onKeyDown={handleKeyDown}
             placeholder="输入消息... (Shift+Enter 换行)"
             className="min-h-[80px] resize-none border-0 bg-transparent px-4 py-3 pb-14 pr-28 focus:outline-none focus:ring-0"
             disabled={isLoading}
           />
           
-          {/* 左侧按钮组 - 靠下边框 */}
           <div className="absolute left-2 bottom-2 flex items-center gap-1">
             <Button
               variant="ghost"
@@ -252,22 +261,21 @@ export function InputArea({ input, handleInputChange, handleSubmit, isLoading, o
             </Button>
           </div>
           
-          {/* 发送/停止按钮 - 靠下边框 */}
           <div className="absolute right-2 bottom-2">
             <Button
-              type="submit"
-              disabled={isLoading ? false : !input.trim()}
+              disabled={isLoading ? false : !(input && input.trim())}
               className={cn(
                 "rounded-full px-6 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
                 isLoading
                   ? "bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600"
                   : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
               )}
-              onClick={(e) => {
+              onClick={() => {
                 if (isLoading) {
                   onStop()
                 } else {
-                  handleSubmit(e as any)
+                  sendMessage({ text: input.trim() }, { body: { systemPrompt } })
+                  setInput('')
                 }
               }}
             >

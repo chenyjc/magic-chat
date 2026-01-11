@@ -41,7 +41,7 @@ npm install
 
 # Ollama 配置（推荐）
 OLLAMA_BASE_URL=http://localhost:11434/v1
-OLLAMA_MODEL=qwen3:4b
+OLLAMA_MODEL=qwen3-coder:30b
 OLLAMA_API_KEY=ollama
 ```
 
