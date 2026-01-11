@@ -1,7 +1,7 @@
 "use client"
 
-import { useRef, useEffect } from "react"
-import { Bot, User } from "lucide-react"
+import { useRef, useEffect, useState, useCallback } from "react"
+import { Bot, User, ArrowDown } from "lucide-react"
 import { MessageBubble } from "./message-bubble"
 import { cn } from "@/lib/utils"
 
@@ -15,26 +15,51 @@ interface ChatContainerProps {
 export function ChatContainer({ messages, status, isThinking, onSuggestionClick }: ChatContainerProps) {
   const isLoading = status === 'submitted' || status === 'streaming'
   const scrollRef = useRef<HTMLDivElement>(null)
+  const [showScrollButton, setShowScrollButton] = useState(false)
 
   const SUGGESTIONS = [
-    "帮我分析这个数据集",
     "生成一个销售趋势图表",
     "解释一下机器学习",
     "写一个Python爬虫",
-    "帮我优化这段代码",
   ]
+
+  const scrollToBottom = useCallback(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
+  }, [])
+
+  const checkScroll = useCallback(() => {
+    if (scrollRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = scrollRef.current
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 100
+      setShowScrollButton(!isAtBottom && messages.length > 0)
+    }
+  }, [messages.length])
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+      setShowScrollButton(false)
     }
   }, [messages, isLoading, isThinking])
+
+  useEffect(() => {
+    const scrollElement = scrollRef.current
+    if (scrollElement) {
+      scrollElement.addEventListener('scroll', checkScroll)
+      return () => scrollElement.removeEventListener('scroll', checkScroll)
+    }
+  }, [checkScroll])
 
   const hasMessages = messages.length > 0
 
   return (
     <div className="flex-1 overflow-y-auto" ref={scrollRef}>
-      <div className="container mx-auto max-w-4xl px-4 py-6">
+      <div className="container mx-auto max-w-4xl px-4 py-6 pb-48">
         {!hasMessages && !isLoading && !isThinking && (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30">
@@ -92,6 +117,16 @@ export function ChatContainer({ messages, status, isThinking, onSuggestionClick 
           />
         ))}
       </div>
+
+      {showScrollButton && (
+        <button
+          onClick={scrollToBottom}
+          className="fixed bottom-24 right-1/2 translate-x-32 z-10 flex h-10 w-10 items-center justify-center rounded-full border bg-background shadow-lg transition-all hover:scale-110 hover:bg-accent"
+          aria-label="滚动到底部"
+        >
+          <ArrowDown className="h-5 w-5" />
+        </button>
+      )}
     </div>
   )
 }

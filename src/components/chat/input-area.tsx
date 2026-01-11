@@ -21,6 +21,7 @@ export function InputArea({ defaultValue, handleInputChange, sendMessage, status
   const [isRecording, setIsRecording] = useState(false)
   const [recordingDuration, setRecordingDuration] = useState(0)
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
+  const [isFocused, setIsFocused] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const recognitionRef = useRef<any>(null)
@@ -181,141 +182,144 @@ export function InputArea({ defaultValue, handleInputChange, sendMessage, status
   }
 
   return (
-    <div className="bg-background p-4">
-      <div className="container mx-auto max-w-3xl">
-        <div className="relative rounded-xl border-2 border-input bg-background/80 backdrop-blur-md shadow-lg">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="hidden"
-          />
+    <div className="pointer-events-auto px-4 w-full max-w-4xl mx-auto">
+      <div className={cn(
+        "relative rounded-xl border-2 border-input shadow-lg transition-all duration-300",
+        isFocused ? "bg-background" : "bg-background/50 backdrop-blur-md"
+      )}>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="hidden"
+        />
 
-          {uploadedImage && (
-            <div className="relative p-4 pb-2">
-              <div className="relative inline-block">
-                <img
-                  src={uploadedImage}
-                  alt="上传的图片"
-                  className="max-h-32 rounded-lg border"
-                />
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={removeUploadedImage}
-                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-background shadow-md hover:bg-destructive hover:text-destructive-foreground"
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </div>
+        {uploadedImage && (
+          <div className="relative p-4 pb-2">
+            <div className="relative inline-block">
+              <img
+                src={uploadedImage}
+                alt="上传的图片"
+                className="max-h-32 rounded-lg border"
+              />
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={removeUploadedImage}
+                className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-background shadow-md hover:bg-destructive hover:text-destructive-foreground"
+              >
+                <X className="h-3 w-3" />
+              </Button>
             </div>
-          )}
-
-          <Textarea
-            ref={textareaRef}
-            value={input}
-            onChange={(e) => {
-              setInput(e.target.value)
-              handleInputChange(e)
-            }}
-            onKeyDown={handleKeyDown}
-            placeholder="输入消息... (Shift+Enter 换行)"
-            className="min-h-[80px] resize-none border-0 bg-transparent px-4 py-3 pb-14 pr-28 focus:outline-none focus:ring-0"
-            disabled={isLoading}
-          />
-          
-          <div className="absolute left-2 bottom-2 flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={isRecording ? stopRecording : startRecording}
-              className={cn(
-                "h-9 w-9 rounded-lg transition-all hover:bg-accent",
-                isRecording && "bg-red-50 border-red-200 hover:bg-red-100 dark:bg-red-900/20 dark:border-red-800 dark:hover:bg-red-900/30"
-              )}
-            >
-              {isRecording ? (
-                <MicOff className="h-4 w-4 text-red-600 dark:text-red-400" />
-              ) : (
-                <Mic className="h-4 w-4" />
-              )}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={handleFileUpload}
-              className="h-9 w-9 rounded-lg hover:bg-accent"
-              title="上传图片"
-            >
-              <Paperclip className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={handlePaste}
-              className="h-9 w-9 rounded-lg hover:bg-accent"
-              title="粘贴"
-            >
-              <Clipboard className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          <div className="absolute right-2 bottom-2">
-            <Button
-              disabled={isLoading ? false : !(input && input.trim())}
-              className={cn(
-                "rounded-full px-6 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-                isLoading
-                  ? "bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600"
-                  : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-              )}
-              onClick={() => {
-                if (isLoading) {
-                  onStop()
-                } else {
-                  sendMessage({ text: input.trim() }, { body: { systemPrompt } })
-                  setInput('')
-                }
-              }}
-            >
-              {isLoading ? (
-                <>
-                  <Square className="mr-2 h-4 w-4" />
-                  停止
-                </>
-              ) : (
-                <>
-                  <Send className="mr-2 h-4 w-4" />
-                  发送
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-
-        {isRecording && (
-          <div className="mt-3 flex items-center justify-between rounded-lg bg-red-50 px-4 py-3 dark:bg-red-900/20">
-            <div className="flex items-center gap-3">
-              <div className="h-3 w-3 animate-pulse rounded-full bg-red-500" />
-              <span className="font-medium text-red-600 dark:text-red-400">
-                正在录音...
-              </span>
-              <span className="font-mono text-sm text-red-500">
-                {formatTime(recordingDuration)}
-              </span>
-            </div>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={stopRecording}
-            >
-              <MicOff className="mr-2 h-4 w-4" />
-              停止
-            </Button>
           </div>
         )}
+
+        <Textarea
+          ref={textareaRef}
+          value={input}
+          onChange={(e) => {
+            setInput(e.target.value)
+            handleInputChange(e)
+          }}
+          onKeyDown={handleKeyDown}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          placeholder="输入消息... (Shift+Enter 换行)"
+          className="min-h-[80px] resize-none border-0 bg-transparent px-4 py-3 pr-28 focus:outline-none focus:ring-0"
+          disabled={isLoading}
+        />
+        
+        <div className="absolute left-2 bottom-2 flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={isRecording ? stopRecording : startRecording}
+            className={cn(
+              "h-9 w-9 rounded-lg transition-all hover:bg-accent",
+              isRecording && "bg-red-50 border-red-200 hover:bg-red-100 dark:bg-red-900/20 dark:border-red-800 dark:hover:bg-red-900/30"
+            )}
+          >
+            {isRecording ? (
+              <MicOff className="h-4 w-4 text-red-600 dark:text-red-400" />
+            ) : (
+              <Mic className="h-4 w-4" />
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={handleFileUpload}
+            className="h-9 w-9 rounded-lg hover:bg-accent"
+            title="上传图片"
+          >
+            <Paperclip className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={handlePaste}
+            className="h-9 w-9 rounded-lg hover:bg-accent"
+            title="粘贴"
+          >
+            <Clipboard className="h-4 w-4" />
+          </Button>
+        </div>
+        
+        <div className="absolute right-2 bottom-2">
+          <Button
+            disabled={isLoading ? false : !(input && input.trim())}
+            className={cn(
+              "rounded-full px-6 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+              isLoading
+                ? "bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600"
+                : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+            )}
+            onClick={() => {
+              if (isLoading) {
+                onStop()
+              } else {
+                sendMessage({ text: input.trim() }, { body: { systemPrompt } })
+                setInput('')
+              }
+            }}
+          >
+            {isLoading ? (
+              <>
+                <Square className="mr-2 h-4 w-4" />
+                停止
+              </>
+            ) : (
+              <>
+                <Send className="mr-2 h-4 w-4" />
+                发送
+              </>
+            )}
+          </Button>
+        </div>
       </div>
+
+      {isRecording && (
+        <div className="mt-3 flex items-center justify-between rounded-lg bg-red-50 px-4 py-3 dark:bg-red-900/20">
+          <div className="flex items-center gap-3">
+            <div className="h-3 w-3 animate-pulse rounded-full bg-red-500" />
+            <span className="font-medium text-red-600 dark:text-red-400">
+              正在录音...
+            </span>
+            <span className="font-mono text-sm text-red-500">
+              {formatTime(recordingDuration)}
+            </span>
+          </div>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={stopRecording}
+          >
+            <MicOff className="mr-2 h-4 w-4" />
+            停止
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

@@ -17,7 +17,7 @@ export function Header({ onNewChat, systemPrompt, onSystemPromptChange }: Header
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md dark:bg-slate-900/80">
+    <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md dark:bg-gray-900/80">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg">

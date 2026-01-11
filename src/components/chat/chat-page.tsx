@@ -45,7 +45,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-background">
+    <div className="relative h-screen">
       <Header 
         onNewChat={handleNewChat} 
         systemPrompt={systemPrompt} 
@@ -57,14 +57,23 @@ export default function ChatPage() {
         isThinking={status === 'streaming' && messages.length > 0}
         onSuggestionClick={handleSuggestionClick}
       />
-      <InputArea
-        defaultValue={localInput}
-        handleInputChange={handleInputChange}
-        sendMessage={sendMessage}
-        status={status}
-        onStop={stop}
-        systemPrompt={safeSystemPrompt}
-      />
+      <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 pointer-events-none">
+        <div className="mx-auto max-w-2xl transition-all duration-300 focus-within:max-w-3xl">
+          <div className="pointer-events-auto rounded-t-xl">
+            <InputArea
+              defaultValue={localInput}
+              handleInputChange={handleInputChange}
+              sendMessage={sendMessage}
+              status={status}
+              onStop={stop}
+              systemPrompt={safeSystemPrompt}
+            />
+            <p className="mt-1 pb-2 text-center text-xs text-muted-foreground">
+              AI也可能会犯错。请核查重要信息。
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
