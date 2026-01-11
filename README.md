@@ -36,14 +36,17 @@ npm install
 创建 `.env.local` 文件：
 
 ```env
-# OpenAI API 配置（可选）
-# OPENAI_API_KEY=your_openai_api_key_here
-
-# Ollama 配置（推荐）
-OLLAMA_BASE_URL=http://localhost:11434/v1
-OLLAMA_MODEL=qwen3-coder:30b
-OLLAMA_API_KEY=ollama
+# Chat API Configuration
+CHAT_API_KEY=your_api_key_here
+CHAT_API_BASE=http://localhost:11434/v1
+CHAT_MODEL=qwen3:4b
 ```
+
+> 注意：`CHAT_API_BASE` 可以配置为任何 OpenAI 兼容的 API 端点，例如：
+> - 本地 Ollama：`http://localhost:11434/v1`
+> - OpenAI 官方：`https://api.openai.com/v1`
+> - Azure OpenAI：`https://your-resource.openai.azure.com/`
+> - 其他兼容服务：根据服务商提供的端点配置
 
 ### 运行开发服务器
 

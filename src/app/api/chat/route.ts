@@ -3,16 +3,16 @@ import { convertToModelMessages, streamText } from 'ai'
 
 export const runtime = 'edge'
 
-const ollama = createOpenAI({
-  baseURL: process.env.OLLAMA_BASE_URL || 'http://localhost:11434/v1',
-  apiKey: process.env.OLLAMA_API_KEY || 'ollama',
+const chat = createOpenAI({
+  baseURL: process.env.CHAT_API_BASE || 'http://localhost:11434/v1',
+  apiKey: process.env.CHAT_API_KEY || 'your_api_key_here',
 })
 
 export async function POST(req: Request) {
   const { messages, systemPrompt } = await req.json()
 
   const result = streamText({
-    model: ollama(process.env.OLLAMA_MODEL || 'qwen3-coder:30b'),
+    model: chat(process.env.CHAT_MODEL || 'qwen3:4b'),
     system: systemPrompt,
     messages: await convertToModelMessages(messages),
   })
