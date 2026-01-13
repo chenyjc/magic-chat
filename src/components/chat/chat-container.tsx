@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState, useCallback } from "react"
 import { Bot, User, ArrowDown } from "lucide-react"
 import { MessageBubble } from "./message-bubble"
+import { GradientBorderCard } from "@/components/ui/gradient-border-card"
 import { cn } from "@/lib/utils"
 
 interface ChatContainerProps {
@@ -73,34 +74,44 @@ export function ChatContainer({ messages, status, isThinking, onSuggestionClick 
             </p>
             <div className="mt-8 grid w-full max-w-lg gap-3">
               {SUGGESTIONS.map((suggestion, index) => (
-                <button
+                <GradientBorderCard
                   key={index}
+                  gradientFrom="#6366f1"
+                  gradientTo="#8b5cf6"
+                  borderWidth={1}
+                  borderRadius="0.75rem"
+                  padding="1rem"
+                  background="hsl(var(--card))"
+                  shadow="small"
+                  animated="scale"
+                  interactive={true}
                   onClick={() => onSuggestionClick?.(suggestion)}
-                  className={cn(
-                    "group relative rounded-xl border bg-card p-4 text-left transition-all",
-                    "hover:border-primary hover:bg-accent hover:shadow-md",
-                    "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                  )}
+                  className="cursor-pointer group"
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`建议: ${suggestion}`}
                 >
-                  <span className="text-sm font-medium text-card-foreground group-hover:text-foreground">
-                    {suggestion}
-                  </span>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
-                    <svg
-                      className="h-4 w-4 text-primary"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-card-foreground group-hover:text-foreground">
+                      {suggestion}
+                    </span>
+                    <div className="opacity-0 transition-opacity group-hover:opacity-100">
+                      <svg
+                        className="h-4 w-4 text-primary"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </div>
                   </div>
-                </button>
+                </GradientBorderCard>
               ))}
             </div>
           </div>
