@@ -250,7 +250,7 @@ export function InputArea({ defaultValue, handleInputChange, sendMessage, status
             onBlur={() => setIsFocused(false)}
             placeholder="输入消息... (Shift+Enter 换行)"
             className={cn(
-              "min-h-[80px] resize-none border-0 bg-transparent px-4 py-3 pr-28 focus:outline-none focus:ring-0 transition-all duration-300",
+              "min-h-[80px] resize-none border-0 bg-transparent px-4 py-3 pr-28 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-300",
               isFocused && "placeholder:text-muted-foreground/70"
             )}
             disabled={isLoading}
