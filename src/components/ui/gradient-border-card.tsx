@@ -8,6 +8,8 @@ export interface GradientBorderCardProps {
   children: React.ReactNode;
   /** 额外的CSS类名 */
   className?: string;
+  /** 内联样式 */
+  style?: React.CSSProperties;
   /** 渐变起始颜色 (默认: #ff6ec7) */
   gradientFrom?: string;
   /** 渐变结束颜色 (默认: #4facfe) */
@@ -23,7 +25,7 @@ export interface GradientBorderCardProps {
   /** 阴影效果配置 (默认: true) */
   shadow?: boolean | 'none' | 'small' | 'medium' | 'large' | 'extra_large' | string;
   /** 动画效果配置 (默认: false) */
-  animated?: boolean | 'none' | 'scale' | 'lift' | 'glow' | 'rotate' | 'pulse' | string;
+  animated?: boolean | 'none' | 'scale' | 'lift' | 'glow' | 'rotate' | 'pulse' | 'focus' | string;
   
   // 可访问性属性
   /** ARIA 标签，描述卡片的用途 */
@@ -139,7 +141,8 @@ export const ANIMATION_PRESETS = {
   lift: 'transition-all duration-300 hover:-translate-y-2 hover:shadow-lg',
   glow: 'transition-all duration-300 hover:shadow-2xl hover:shadow-pink-500/25',
   rotate: 'transition-all duration-300 hover:rotate-1',
-  pulse: 'transition-all duration-300 hover:scale-105 animate-pulse'
+  pulse: 'transition-all duration-300 hover:scale-105 animate-pulse',
+  focus: 'transition-all duration-500 ease-in-out'
 } as const;
 
 /**
@@ -428,6 +431,7 @@ const getAnimationClasses = (animated: boolean | string): string => {
 export const GradientBorderCard: React.FC<GradientBorderCardProps> = ({
   children,
   className = '',
+  style,
   gradientFrom = '#ff6ec7',
   gradientTo = '#4facfe',
   borderWidth = 2,
@@ -531,9 +535,11 @@ export const GradientBorderCard: React.FC<GradientBorderCardProps> = ({
       ...(interactive && {
         cursor: 'pointer',
         outline: 'none'
-      })
+      }),
+      // 合并用户提供的样式
+      ...style
     };
-  }, [validatedProps, shadow, interactive]);
+  }, [validatedProps, shadow, interactive, style]);
 
   // 内层容器样式（内容背景层）- 使用useMemo优化性能
   const contentStyle: React.CSSProperties = useMemo(() => ({

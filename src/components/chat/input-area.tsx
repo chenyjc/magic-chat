@@ -185,18 +185,29 @@ export function InputArea({ defaultValue, handleInputChange, sendMessage, status
   return (
     <div className="pointer-events-auto px-4 w-full max-w-4xl mx-auto">
       <GradientBorderCard
-        gradientFrom="#3b82f6"
-        gradientTo="#8b5cf6"
-        borderWidth={2}
+        gradientFrom={isFocused ? "#06b6d4" : "#3b82f6"}
+        gradientTo={isFocused ? "#d946ef" : "#8b5cf6"}
+        borderWidth={isFocused ? 3 : 2}
         borderRadius="0.75rem"
         padding="0"
         background="hsl(var(--background))"
-        shadow="large"
-        animated="lift"
+        shadow={isFocused ? "extra_large" : "large"}
+        animated="focus"
         className={cn(
-          "transition-all duration-300",
-          isFocused ? "shadow-xl" : ""
+          "transition-all duration-500 ease-in-out transform relative",
+          isFocused ? "scale-[1.02] shadow-2xl shadow-cyan-500/20" : "scale-100",
+          isFocused && "before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-cyan-500/20 before:to-pink-500/20 before:animate-pulse before:-z-10 before:blur-sm"
         )}
+        style={{
+          ...(isFocused && {
+            boxShadow: `
+              0 0 0 1px rgba(6, 182, 212, 0.3),
+              0 0 20px rgba(6, 182, 212, 0.2),
+              0 0 40px rgba(217, 70, 239, 0.1),
+              0 20px 40px rgba(0, 0, 0, 0.15)
+            `
+          })
+        }}
       >
         <div className="relative">
           <input
@@ -238,7 +249,10 @@ export function InputArea({ defaultValue, handleInputChange, sendMessage, status
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             placeholder="输入消息... (Shift+Enter 换行)"
-            className="min-h-[80px] resize-none border-0 bg-transparent px-4 py-3 pr-28 focus:outline-none focus:ring-0"
+            className={cn(
+              "min-h-[80px] resize-none border-0 bg-transparent px-4 py-3 pr-28 focus:outline-none focus:ring-0 transition-all duration-300",
+              isFocused && "placeholder:text-muted-foreground/70"
+            )}
             disabled={isLoading}
           />
           
@@ -282,10 +296,11 @@ export function InputArea({ defaultValue, handleInputChange, sendMessage, status
             <Button
               disabled={isLoading ? false : !(input && input.trim())}
               className={cn(
-                "rounded-full px-6 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+                "rounded-full px-6 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-300",
                 isLoading
-                  ? "bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600"
-                  : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                  ? "bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 shadow-lg"
+                  : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg hover:shadow-xl",
+                isFocused && "scale-105 shadow-xl"
               )}
               onClick={() => {
                 if (isLoading) {
